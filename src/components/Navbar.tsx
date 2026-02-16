@@ -1,13 +1,18 @@
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { CarFrontIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Navbar() {
   return (
     <nav className='bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur'>
       <div className='container mx-auto flex h-14 items-center'>
         <div className='mr-4 hidden md:flex'>
-          <Link to='/' className='mr-6 flex items-center space-x-2'>
-            <span className='hidden font-bold sm:inline-block'>CarRental</span>
+          <Link
+            to='/'
+            className='text-primary mr-6 flex items-center space-x-2'
+          >
+            <CarFrontIcon />
+            <span className='hidden font-bold sm:inline-block'>Car Rental</span>
           </Link>
           <nav className='flex items-center space-x-6 text-sm font-medium'>
             <Link
