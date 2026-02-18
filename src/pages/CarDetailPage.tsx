@@ -1,27 +1,50 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useEffect, useState, useMemo } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { CarService } from "@/services/car.service";
 import type { Car, CarImage, Booking } from "@/services/car.service";
+import { BookingService } from "@/services/booking.service";
 import {
     ChevronLeft,
-    Calendar,
+    Calendar as CalendarIcon,
     User,
     Gauge,
     Coins,
     Tag,
     Fuel,
     CheckCircle2,
-    Loader2
+    Loader2,
+    Info
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import type { DateRange } from "react-day-picker";
+import { addDays, differenceInDays, format } from "date-fns";
+import { toast } from "sonner";
 
 export const CarDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [car, setCar] = useState<Car | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Booking State
+    const [showBookingDialog, setShowBookingDialog] = useState(false);
+    const [dateRange, setDateRange] = useState<DateRange | undefined>({
+        from: addDays(new Date(), 1),
+        to: addDays(new Date(), 3),
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchCar = async () => {
@@ -38,6 +61,44 @@ export const CarDetailPage: React.FC = () => {
 
         fetchCar();
     }, [id]);
+
+    const totalPrice = useMemo(() => {
+        if (!car || !dateRange?.from || !dateRange?.to) return 0;
+        const days = differenceInDays(dateRange.to, dateRange.from);
+        return days > 0 ? days * Number(car.rental_price_per_day) : 0;
+    }, [car, dateRange]);
+
+    const handleReserve = () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            toast.error("Please login to reserve a car");
+            navigate("/login");
+            return;
+        }
+        setShowBookingDialog(true);
+    };
+
+    const confirmBooking = async () => {
+        if (!car || !dateRange?.from || !dateRange?.to) return;
+
+        setIsSubmitting(true);
+        try {
+            await BookingService.createBooking({
+                car_id: car.car_id,
+                start_date: dateRange.from.toISOString(),
+                end_date: dateRange.to.toISOString(),
+            });
+            toast.success("Booking created! A staff member will contact you soon.");
+            setShowBookingDialog(false);
+            // Optionally refresh car details to show the new booking activity
+            const data = await CarService.getCarById(car.car_id);
+            setCar(data);
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || err.message || "Failed to create booking");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -139,7 +200,7 @@ export const CarDetailPage: React.FC = () => {
                         {car.bookings && car.bookings.length > 0 && (
                             <Card className="mb-10 bg-primary/5 border-primary/10 shadow-none rounded-3xl p-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Calendar className="w-5 h-5 text-primary" />
+                                    <CalendarIcon className="w-5 h-5 text-primary" />
                                     <h3 className="text-lg font-semibold text-foreground">Recent Activity</h3>
                                 </div>
                                 {car.bookings.map((booking: Booking, idx: number) => (
@@ -174,8 +235,13 @@ export const CarDetailPage: React.FC = () => {
 
                         {/* Actions */}
                         <div className="mt-auto flex flex-col sm:flex-row gap-4">
-                            <Button size="lg" className="flex-1 h-16 text-lg font-extrabold uppercase tracking-wider rounded-2xl shadow-lg shadow-primary/20">
-                                Reserve Now
+                            <Button
+                                size="lg"
+                                className="flex-1 h-16 text-lg font-extrabold uppercase tracking-wider rounded-2xl shadow-lg shadow-primary/20"
+                                onClick={handleReserve}
+                                disabled={car.status !== 'Available'}
+                            >
+                                {car.status === 'Available' ? 'Reserve Now' : 'Not Available'}
                             </Button>
                             <Button variant="outline" size="lg" className="h-16 px-8 text-lg font-bold uppercase tracking-wider rounded-2xl">
                                 Add to Wishlist
@@ -184,6 +250,77 @@ export const CarDetailPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Booking Dialog */}
+            <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Complete Your Reservation</DialogTitle>
+                        <DialogDescription>
+                            Select your preferred rental dates to book <span className="font-bold text-foreground">{car.name}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-6 py-4">
+                        <div className="flex justify-center border rounded-xl p-2 bg-muted/20">
+                            <Calendar
+                                mode="range"
+                                selected={dateRange}
+                                onSelect={setDateRange}
+                                disabled={{ before: addDays(new Date(), 1) }}
+                                initialFocus
+                            />
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center text-sm border-b pb-4 border-dashed">
+                                <span className="text-muted-foreground">Rental Period:</span>
+                                <span className="font-medium text-foreground">
+                                    {dateRange?.from && dateRange?.to ? (
+                                        `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`
+                                    ) : (
+                                        "Select dates"
+                                    )}
+                                </span>
+                            </div>
+
+                            <Card className="bg-primary/5 border-primary/20 shadow-none p-4">
+                                <div className="flex justify-between items-end">
+                                    <div className="space-y-1">
+                                        <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Estimated Total Price</p>
+                                        <p className="text-3xl font-black text-primary">${totalPrice}</p>
+                                    </div>
+                                    <Badge variant="secondary" className="mb-1">
+                                        {differenceInDays(dateRange?.to || 0, dateRange?.from || 0)} Days
+                                    </Badge>
+                                </div>
+                            </Card>
+
+                            <div className="flex gap-2 p-3 bg-muted/40 rounded-lg text-[10px] text-muted-foreground leading-tight">
+                                <Info className="size-4 shrink-0 text-primary" />
+                                <p>This is a preliminary reservation. A staff member will verify availability and finalize your deposit via the payment system.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowBookingDialog(false)}
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={confirmBooking}
+                            disabled={!dateRange?.from || !dateRange?.to || isSubmitting || totalPrice === 0}
+                            className="font-bold px-8"
+                        >
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : "Confirm Reservation"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

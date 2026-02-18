@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/MainLayout";
@@ -10,6 +11,7 @@ import { CarDetailPage } from "@/pages/CarDetailPage";
 export function App() {
   return (
     <TooltipProvider>
+      <Toaster position="top-center" richColors />
       <BrowserRouter>
         <Routes>
           <Route element={<MainLayout />}>
