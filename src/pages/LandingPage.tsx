@@ -1,5 +1,3 @@
-import { Footer } from '@/components/Footer';
-import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -40,115 +38,111 @@ export function LandingPage() {
   ];
 
   return (
-    <div className='flex min-h-screen flex-col'>
-      <Navbar />
-      <main className='flex-1'>
-        {/* Hero Section */}
-        <section className='from-primary/10 space-y-6 border-b bg-gradient-to-b via-transparent to-transparent pt-6 pb-8 md:pt-10 md:pb-12 lg:py-32'>
-          <div className='container mx-auto flex max-w-[64rem] flex-col items-center gap-4 text-center'>
-            <h1 className='font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl'>
-              Rent the car of your dreams.
-            </h1>
-            <p className='text-muted-foreground max-w-[42rem] leading-normal sm:text-xl sm:leading-8'>
-              Choose from a wide range of premium vehicles for your next
-              adventure. Affordable rates, 24/7 support, and easy booking.
-            </p>
-            <div className='space-x-4'>
-              <Button size='lg' asChild>
-                <Link to='/cars'>Browse Cars</Link>
-              </Button>
-              <Button size='lg' variant='outline' asChild>
-                <Link to='/contact'>Contact Sales</Link>
-              </Button>
-            </div>
+    <div className='flex-1'>
+      {/* Hero Section */}
+      <section className='from-primary/10 space-y-6 border-b bg-gradient-to-b via-transparent to-transparent pt-6 pb-8 md:pt-10 md:pb-12 lg:py-32'>
+        <div className='container mx-auto flex max-w-[64rem] flex-col items-center gap-4 text-center'>
+          <h1 className='font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl'>
+            Rent the car of your dreams.
+          </h1>
+          <p className='text-muted-foreground max-w-[42rem] leading-normal sm:text-xl sm:leading-8'>
+            Choose from a wide range of premium vehicles for your next
+            adventure. Affordable rates, 24/7 support, and easy booking.
+          </p>
+          <div className='space-x-4'>
+            <Button size='lg' asChild>
+              <Link to='/cars'>Browse Cars</Link>
+            </Button>
+            <Button size='lg' variant='outline' asChild>
+              <Link to='/contact'>Contact Sales</Link>
+            </Button>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Featured Cars Section */}
-        <section
-          className='container mx-auto space-y-6 py-8 md:py-12 lg:py-24'
-          id='featured'
-        >
-          <div className='mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center'>
-            <h2 className='font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl'>
-              Featured Cars
-            </h2>
-            <p className='text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7'>
-              Check out our most popular vehicles available for rent today.
-            </p>
-          </div>
-          <div className='mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3'>
-            {featuredCars.map((car) => (
-              <Card key={car.id}>
-                <CardHeader>
-                  <img
-                    src={car.image}
-                    alt={car.name}
-                    className='aspect-video w-full rounded-md object-cover'
-                  />
-                </CardHeader>
-                <CardContent>
-                  <CardTitle>{car.name}</CardTitle>
-                  <CardDescription>{car.type}</CardDescription>
-                </CardContent>
-                <CardFooter className='flex items-center justify-between'>
-                  <span className='font-bold'>{car.price}</span>
-                  <Button size='sm' asChild>
-                    <Link to={`/cars/${car.id}`}>Details</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section>
+      {/* Featured Cars Section */}
+      <section
+        className='container mx-auto space-y-6 py-8 md:py-12 lg:py-24'
+        id='featured'
+      >
+        <div className='mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center'>
+          <h2 className='font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl'>
+            Featured Cars
+          </h2>
+          <p className='text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7'>
+            Check out our most popular vehicles available for rent today.
+          </p>
+        </div>
+        <div className='mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3'>
+          {featuredCars.map((car) => (
+            <Card key={car.id}>
+              <CardHeader>
+                <img
+                  src={car.image}
+                  alt={car.name}
+                  className='aspect-video w-full rounded-md object-cover'
+                />
+              </CardHeader>
+              <CardContent>
+                <CardTitle>{car.name}</CardTitle>
+                <CardDescription>{car.type}</CardDescription>
+              </CardContent>
+              <CardFooter className='flex items-center justify-between'>
+                <span className='font-bold'>{car.price}</span>
+                <Button size='sm' asChild>
+                  <Link to={`/cars/${car.id}`}>Details</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-        {/* Services Section */}
-        <section
-          className='space-y-6 bg-slate-50 py-8 md:py-12 lg:py-24 dark:bg-transparent'
-          id='services'
-        >
-          <div className='mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center'>
-            <h2 className='font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl'>
-              Why Choose Us?
-            </h2>
-          </div>
-          <div className='mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3'>
-            <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
-              <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
-                <div className='space-y-2'>
-                  <h3 className='font-bold'>24/7 Support</h3>
-                  <p className='text-muted-foreground text-sm'>
-                    We are always here to help you with any questions or issues.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
-              <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
-                <div className='space-y-2'>
-                  <h3 className='font-bold'>Best Prices</h3>
-                  <p className='text-muted-foreground text-sm'>
-                    We offer competitive rates and special discounts for
-                    long-term rentals.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
-              <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
-                <div className='space-y-2'>
-                  <h3 className='font-bold'>Easy Booking</h3>
-                  <p className='text-muted-foreground text-sm'>
-                    Book your car in just a few clicks with our user-friendly
-                    platform.
-                  </p>
-                </div>
+      {/* Services Section */}
+      <section
+        className='space-y-6 bg-slate-50 py-8 md:py-12 lg:py-24 dark:bg-transparent'
+        id='services'
+      >
+        <div className='mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center'>
+          <h2 className='font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl'>
+            Why Choose Us?
+          </h2>
+        </div>
+        <div className='mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3'>
+          <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
+            <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
+              <div className='space-y-2'>
+                <h3 className='font-bold'>24/7 Support</h3>
+                <p className='text-muted-foreground text-sm'>
+                  We are always here to help you with any questions or issues.
+                </p>
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      <Footer />
+          <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
+            <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
+              <div className='space-y-2'>
+                <h3 className='font-bold'>Best Prices</h3>
+                <p className='text-muted-foreground text-sm'>
+                  We offer competitive rates and special discounts for
+                  long-term rentals.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className='bg-background relative overflow-hidden rounded-lg border p-2'>
+            <div className='flex h-[180px] flex-col justify-between rounded-md p-6'>
+              <div className='space-y-2'>
+                <h3 className='font-bold'>Easy Booking</h3>
+                <p className='text-muted-foreground text-sm'>
+                  Book your car in just a few clicks with our user-friendly
+                  platform.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
