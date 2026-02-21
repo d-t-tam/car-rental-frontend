@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { CarService } from "@/services/car.service";
 import type { Car, CarImage, Booking } from "@/services/car.service";
 import { BookingService } from "@/services/booking.service";
+import { useAuth } from "@/contexts/AuthContext";
 import {
     ChevronLeft,
     Calendar as CalendarIcon,
@@ -34,6 +35,7 @@ import { toast } from "sonner";
 export const CarDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
     const [car, setCar] = useState<Car | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -62,15 +64,18 @@ export const CarDetailPage: React.FC = () => {
         fetchCar();
     }, [id]);
 
+    const totalDays = useMemo(() => {
+        if (!dateRange?.from || !dateRange?.to) return 0;
+        return differenceInDays(dateRange.to, dateRange.from) + 1;
+    }, [dateRange]);
+
     const totalPrice = useMemo(() => {
-        if (!car || !dateRange?.from || !dateRange?.to) return 0;
-        const days = differenceInDays(dateRange.to, dateRange.from);
-        return days > 0 ? days * Number(car.rental_price_per_day) : 0;
-    }, [car, dateRange]);
+        if (!car || totalDays === 0) return 0;
+        return totalDays * Number(car.rental_price_per_day);
+    }, [car, totalDays]);
 
     const handleReserve = () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
+        if (!isAuthenticated) {
             toast.error("Please login to reserve a car");
             navigate("/login");
             return;
@@ -291,7 +296,7 @@ export const CarDetailPage: React.FC = () => {
                                         <p className="text-3xl font-black text-primary">${totalPrice}</p>
                                     </div>
                                     <Badge variant="secondary" className="mb-1">
-                                        {differenceInDays(dateRange?.to || 0, dateRange?.from || 0)} Days
+                                        {totalDays} Days
                                     </Badge>
                                 </div>
                             </Card>

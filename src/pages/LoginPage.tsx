@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthService } from "@/services/auth.service";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,9 +36,8 @@ export function LoginPage() {
         setError(null);
         try {
             const response = await AuthService.login(data);
-            localStorage.setItem("token", response.token);
-            localStorage.setItem("user", JSON.stringify(response.user));
-            navigate("/"); // Redirect to home/dashboard
+            login(response.user, response.token);
+            navigate("/");
         } catch (err: unknown) {
             if (err && typeof err === 'object' && 'response' in err) {
                 const apiError = err as { response: { data: { message: string } } };
