@@ -48,7 +48,6 @@ export const CarDetailPage: React.FC = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [bookedDates, setBookedDates] = useState<DateRange[]>([]);
-    const [isLoadingBookedDates, setIsLoadingBookedDates] = useState(false);
 
     useEffect(() => {
         const fetchCar = async () => {
@@ -69,7 +68,7 @@ export const CarDetailPage: React.FC = () => {
     useEffect(() => {
         const fetchBookedDates = async () => {
             if (!id) return;
-            setIsLoadingBookedDates(true);
+
             try {
                 const dates = await BookingService.getBookedDates(Number(id));
                 const formattedDates = dates.map(d => ({
@@ -79,8 +78,6 @@ export const CarDetailPage: React.FC = () => {
                 setBookedDates(formattedDates);
             } catch (err: any) {
                 console.error("Failed to load booked dates:", err);
-            } finally {
-                setIsLoadingBookedDates(false);
             }
         };
 

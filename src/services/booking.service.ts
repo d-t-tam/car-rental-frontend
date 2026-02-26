@@ -37,4 +37,8 @@ export class BookingService {
         const response = await api.get("/bookings/my-bookings");
         return response.data;
     }
+
+    static async cancelBooking(bookingId: number): Promise<void> {
+        await api.patch(`/bookings/${bookingId}/cancel`);
+    }
 }
