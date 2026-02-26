@@ -47,6 +47,8 @@ export const CarDetailPage: React.FC = () => {
         to: addDays(new Date(), 3),
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [bookedDates, setBookedDates] = useState<DateRange[]>([]);
+    const [isLoadingBookedDates, setIsLoadingBookedDates] = useState(false);
 
     useEffect(() => {
         const fetchCar = async () => {
@@ -63,6 +65,29 @@ export const CarDetailPage: React.FC = () => {
 
         fetchCar();
     }, [id]);
+
+    useEffect(() => {
+        const fetchBookedDates = async () => {
+            if (!id) return;
+            setIsLoadingBookedDates(true);
+            try {
+                const dates = await BookingService.getBookedDates(Number(id));
+                const formattedDates = dates.map(d => ({
+                    from: new Date(d.start_date),
+                    to: new Date(d.end_date)
+                }));
+                setBookedDates(formattedDates);
+            } catch (err: any) {
+                console.error("Failed to load booked dates:", err);
+            } finally {
+                setIsLoadingBookedDates(false);
+            }
+        };
+
+        if (showBookingDialog) {
+            fetchBookedDates();
+        }
+    }, [id, showBookingDialog]);
 
     const totalDays = useMemo(() => {
         if (!dateRange?.from || !dateRange?.to) return 0;
@@ -129,7 +154,6 @@ export const CarDetailPage: React.FC = () => {
     return (
         <div className="py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                {/* Header/Back Link */}
                 <div className="mb-8">
                     <Button variant="ghost" asChild className="group -ml-4">
                         <Link to="/cars" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
@@ -140,7 +164,6 @@ export const CarDetailPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    {/* Left Column: Images */}
                     <div className="space-y-6">
                         <Card className="aspect-[16/9] border-none shadow-xl overflow-hidden bg-muted">
                             {car.images && car.images.length > 0 ? (
@@ -164,7 +187,6 @@ export const CarDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Info & Actions */}
                     <div className="flex flex-col">
                         <div className="mb-8">
                             <Badge variant="secondary" className="mb-4 uppercase tracking-wider">
@@ -178,7 +200,6 @@ export const CarDetailPage: React.FC = () => {
                             </p>
                         </div>
 
-                        {/* Specs Grid */}
                         <div className="grid grid-cols-2 gap-4 mb-10">
                             {[
                                 { icon: Coins, label: "Rental Price", value: `$${car.rental_price_per_day}`, sub: "/day", color: "text-yellow-500" },
@@ -201,7 +222,6 @@ export const CarDetailPage: React.FC = () => {
                             ))}
                         </div>
 
-                        {/* Booking Activity (if any) */}
                         {car.bookings && car.bookings.length > 0 && (
                             <Card className="mb-10 bg-primary/5 border-primary/10 shadow-none rounded-3xl p-6">
                                 <div className="flex items-center gap-2 mb-4">
@@ -228,7 +248,6 @@ export const CarDetailPage: React.FC = () => {
                             </Card>
                         )}
 
-                        {/* Description */}
                         {car.description && (
                             <div className="mb-10">
                                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">About this Car</h3>
@@ -238,7 +257,6 @@ export const CarDetailPage: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Actions */}
                         <div className="mt-auto flex flex-col sm:flex-row gap-4">
                             <Button
                                 size="lg"
@@ -256,7 +274,6 @@ export const CarDetailPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Booking Dialog */}
             <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -272,7 +289,14 @@ export const CarDetailPage: React.FC = () => {
                                 mode="range"
                                 selected={dateRange}
                                 onSelect={setDateRange}
-                                disabled={{ before: addDays(new Date(), 1) }}
+                                disabled={[
+                                    { before: addDays(new Date(), 1) },
+                                    ...bookedDates
+                                ]}
+                                modifiers={{ booked: bookedDates }}
+                                modifiersClassNames={{
+                                    booked: "bg-red-100 text-red-900 opacity-50 cursor-not-allowed line-through relative after:content-[''] after:absolute after:inset-0 after:bg-red-500/10 after:pointer-events-none"
+                                }}
                                 initialFocus
                             />
                         </div>
