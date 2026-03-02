@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { CarService } from "@/services/car.service";
 import type { Car, CarImage, Booking } from "@/services/car.service";
 import { BookingService } from "@/services/booking.service";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUserAuth } from "@/contexts/AuthContext";
 import {
     ChevronLeft,
     Calendar as CalendarIcon,
@@ -35,7 +35,7 @@ import { toast } from "sonner";
 export const CarDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useUserAuth();
     const [car, setCar] = useState<Car | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

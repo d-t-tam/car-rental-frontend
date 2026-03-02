@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthService } from "@/services/auth.service";
-import { useAuth } from "@/contexts/AuthContext";
+import { useStaffAuth, useUserAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +19,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login: loginUser, logout: logoutUser } = useUserAuth();
+    const { login: loginStaff, logout: logoutStaff } = useStaffAuth();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +37,16 @@ export function LoginPage() {
         setError(null);
         try {
             const response = await AuthService.login(data);
-            login(response.user, response.token);
+            const role = response.user.role.toLowerCase();
+            if (role === "staff" || role === "admin") {
+                logoutUser();
+                loginStaff(response.user, response.token);
+                navigate("/staff");
+                return;
+            }
+
+            logoutStaff();
+            loginUser(response.user, response.token);
             navigate("/");
         } catch (err: unknown) {
             if (err && typeof err === 'object' && 'response' in err) {
@@ -82,6 +92,14 @@ export function LoginPage() {
                         Don't have an account?{" "}
                         <Link to="/register" className="text-blue-600 hover:underline">
                             Register
+                        </Link>
+                    </p>
+                </CardFooter>
+                <CardFooter className="pt-0">
+                    <p className="w-full text-center text-sm text-gray-600">
+                        Staff account?{" "}
+                        <Link to="/staff/login" className="text-primary hover:underline">
+                            Login to Staff Portal
                         </Link>
                     </p>
                 </CardFooter>

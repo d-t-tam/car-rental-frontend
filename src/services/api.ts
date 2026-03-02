@@ -9,7 +9,13 @@ export const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("token");
+        const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+        const isStaffArea = pathname.startsWith("/staff");
+
+        const token = isStaffArea
+            ? localStorage.getItem("staff_token") || localStorage.getItem("user_token")
+            : localStorage.getItem("user_token") || localStorage.getItem("staff_token");
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

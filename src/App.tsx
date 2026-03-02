@@ -2,12 +2,17 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/MainLayout";
+import { StaffLayout } from "@/components/StaffLayout";
+import { RequireStaffAuth } from "@/components/RequireStaffAuth";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { StaffLoginPage } from "@/pages/StaffLoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { BrowseCarsPage } from "@/pages/BrowseCarsPage";
 import { CarDetailPage } from "@/pages/CarDetailPage";
 import { ProfilePage } from "@/pages/ProfilePage";
+import { StaffDashboardPage } from "@/pages/StaffDashboardPage";
+import { StaffBookingReviewPage } from "@/pages/StaffBookingReviewPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export function App() {
@@ -24,6 +29,13 @@ export function App() {
               <Route path="/cars" element={<BrowseCarsPage />} />
               <Route path="/cars/:id" element={<CarDetailPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="/staff/login" element={<StaffLoginPage />} />
+            <Route element={<RequireStaffAuth />}>
+              <Route element={<StaffLayout />}>
+                <Route path="/staff" element={<StaffDashboardPage />} />
+                <Route path="/staff/bookings" element={<StaffBookingReviewPage />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>

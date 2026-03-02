@@ -8,10 +8,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUserAuth } from '@/contexts/AuthContext';
 
 export function Navbar() {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout } = useUserAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
