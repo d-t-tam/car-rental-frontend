@@ -13,6 +13,7 @@ import { CarDetailPage } from "@/pages/CarDetailPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { StaffDashboardPage } from "@/pages/StaffDashboardPage";
 import { StaffBookingReviewPage } from "@/pages/StaffBookingReviewPage";
+import { StaffHandoverPage } from "@/pages/StaffHandoverPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export function App() {
@@ -35,6 +36,7 @@ export function App() {
               <Route element={<StaffLayout />}>
                 <Route path="/staff" element={<StaffDashboardPage />} />
                 <Route path="/staff/bookings" element={<StaffBookingReviewPage />} />
+                <Route path="/staff/handover" element={<StaffHandoverPage />} />
               </Route>
             </Route>
           </Routes>

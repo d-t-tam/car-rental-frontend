@@ -28,11 +28,11 @@ export function Footer() {
             .
           </p>
         </div>
-        <div className='w-full border-t pt-4 text-center md:w-auto md:border-0 md:pt-0'>
+        {/* <div className='w-full border-t pt-4 text-center md:w-auto md:border-0 md:pt-0'>
           <Button variant='outline' asChild>
             <Link to='/staff/login'>Staff Portal</Link>
           </Button>
-        </div>
+        </div> */}
       </div>
     </footer>
   );
