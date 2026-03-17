@@ -13,10 +13,20 @@ export interface Booking {
     start_date: string;
     end_date: string;
     total_price: string;
+    total_paid?: string;
     status: string;
+    payment_status?: string;
+    created_at?: string;
+    updated_at?: string;
     car: {
         car_id: number;
         name: string;
+        brand?: string;
+        model?: string;
+        license_plate?: string;
+        status?: string;
+        current_mileage?: number;
+        rental_price_per_day?: string;
         category: { name: string };
         images: { image_url: string; is_thumbnail: boolean }[];
     };

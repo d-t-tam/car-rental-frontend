@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { CarFrontIcon, User, LogOut } from 'lucide-react';
+import { CarFrontIcon, User, LogOut, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     DropdownMenu,
@@ -67,6 +67,12 @@ export function Navbar() {
                                         <Link to='/profile' className='flex items-center'>
                                             <User className='mr-2 h-4 w-4' />
                                             Profile
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link to='/checkout' className='flex items-center'>
+                                            <CreditCard className='mr-2 h-4 w-4' />
+                                            Payments
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
