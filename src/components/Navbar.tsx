@@ -70,7 +70,7 @@ export function Navbar() {
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link to='/checkout' className='flex items-center'>
+                                        <Link to='/payment' className='flex items-center'>
                                             <CreditCard className='mr-2 h-4 w-4' />
                                             Payments
                                         </Link>

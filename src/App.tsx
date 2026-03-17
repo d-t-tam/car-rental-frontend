@@ -12,6 +12,7 @@ import { BrowseCarsPage } from "@/pages/BrowseCarsPage";
 import { CarDetailPage } from "@/pages/CarDetailPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { CheckoutPage } from "@/pages/CheckoutPage";
+import { PaymentPage } from "@/pages/PaymentPage";
 import { StaffDashboardPage } from "@/pages/StaffDashboardPage";
 import { StaffBookingReviewPage } from "@/pages/StaffBookingReviewPage";
 import { StaffHandoverPage } from "@/pages/StaffHandoverPage";
@@ -32,6 +33,7 @@ export function App() {
               <Route path="/cars/:id" element={<CarDetailPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/payment" element={<PaymentPage />} />
             </Route>
             <Route path="/staff/login" element={<StaffLoginPage />} />
             <Route element={<RequireStaffAuth />}>
