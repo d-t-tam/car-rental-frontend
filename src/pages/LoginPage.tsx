@@ -1,109 +1,159 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useNavigate, Link } from "react-router-dom";
-import { AuthService } from "@/services/auth.service";
-import { useStaffAuth, useUserAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthService } from '@/services/auth.service';
+import { useStaffAuth, useUserAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group';
+import { EyeIcon, EyeOffIcon, LogInIcon } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 
 const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(1, "Password is required"),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
-    const navigate = useNavigate();
-    const { login: loginUser, logout: logoutUser } = useUserAuth();
-    const { login: loginStaff, logout: logoutStaff } = useStaffAuth();
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login: loginUser, logout: logoutUser } = useUserAuth();
+  const { login: loginStaff, logout: logoutStaff } = useStaffAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<LoginFormValues>({
-        resolver: zodResolver(loginSchema),
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-    const onSubmit = async (data: LoginFormValues) => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await AuthService.login(data);
-            const role = response.user.role.toLowerCase();
-            if (role === "staff" || role === "admin") {
-                logoutUser();
-                loginStaff(response.user, response.token);
-                navigate("/staff");
-                return;
-            }
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await AuthService.login(data);
+      const role = response.user.role.toLowerCase();
+      if (role === 'staff' || role === 'admin') {
+        logoutUser();
+        loginStaff(response.user, response.token);
+        navigate('/staff');
+        return;
+      }
 
-            logoutStaff();
-            loginUser(response.user, response.token);
-            navigate("/");
-        } catch (err: unknown) {
-            if (err && typeof err === 'object' && 'response' in err) {
-                const apiError = err as { response: { data: { message: string } } };
-                setError(apiError.response?.data?.message || "Login failed. Please check your credentials.");
-            } else {
-                setError("Login failed. Please check your credentials.");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+      logoutStaff();
+      loginUser(response.user, response.token);
+      navigate('/');
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const apiError = err as { response: { data: { message: string } } };
+        setError(
+          apiError.response?.data?.message ||
+            'Login failed. Please check your credentials.'
+        );
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
-                    <CardDescription className="text-center">Enter your email and password to login</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder="m@example.com" {...register("email")} />
-                            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input id="password" type="password" placeholder="******" {...register("password")} />
-                            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-                        </div>
+  return (
+    <div className='flex min-h-screen items-center justify-center bg-gray-100 p-4'>
+      <Card className='w-full max-w-md'>
+        <CardHeader>
+          <CardTitle className='text-center text-2xl font-bold'>
+            Welcome Back
+          </CardTitle>
+          <CardDescription className='text-center'>
+            Enter your email and password to login
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='email'>Email</Label>
+              <Input
+                id='email'
+                type='email'
+                placeholder='m@example.com'
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className='text-sm text-red-500'>{errors.email.message}</p>
+              )}
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='password'>Password</Label>
+              <InputGroup>
+                <InputGroupInput
+                  id='password'
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='Enter your password'
+                  {...register('password')}
+                />
+                <InputGroupAddon
+                  align={'inline-end'}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='cursor-pointer'
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </InputGroupAddon>
+              </InputGroup>
+              {errors.password && (
+                <p className='text-sm text-red-500'>
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
 
-                        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+            {error && (
+              <p className='text-center text-sm text-red-500'>{error}</p>
+            )}
 
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Logging in..." : "Login"}
-                        </Button>
-                    </form>
-                </CardContent>
-                <CardFooter className="flex justify-center">
-                    <p className="text-sm text-gray-600">
-                        Don't have an account?{" "}
-                        <Link to="/register" className="text-blue-600 hover:underline">
-                            Register
-                        </Link>
-                    </p>
-                </CardFooter>
-                <CardFooter className="pt-0">
-                    <p className="w-full text-center text-sm text-gray-600">
-                        Staff account?{" "}
-                        <Link to="/staff/login" className="text-primary hover:underline">
-                            Login to Staff Portal
-                        </Link>
-                    </p>
-                </CardFooter>
-            </Card>
-        </div>
-    );
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? <Spinner /> : <LogInIcon />}
+              <span>Login</span>
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className='flex justify-center'>
+          <p className='text-sm text-gray-600'>
+            Don't have an account?{' '}
+            <Link to='/register' className='text-blue-600 hover:underline'>
+              Register
+            </Link>
+          </p>
+        </CardFooter>
+        <CardFooter className='pt-0'>
+          <p className='w-full text-center text-sm text-gray-600'>
+            Staff account?{' '}
+            <Link to='/staff/login' className='text-primary hover:underline'>
+              Login to Staff Portal
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
 }
